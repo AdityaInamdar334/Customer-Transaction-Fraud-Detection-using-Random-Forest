@@ -1,10 +1,12 @@
+# Re-import necessary libraries after execution state reset
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-import matplotlib.pyplot as plt
-import seaborn as sns
+from imblearn.over_sampling import SMOTE
 
 # Simulating a dataset for Customer Transaction Fraud Detection
 np.random.seed(42)
@@ -31,26 +33,30 @@ X = df.drop(columns=['Is_Fraud'])
 y = df['Is_Fraud']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Initializing and training the Random Forest model
-model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train, y_train)
+# Apply SMOTE to balance the dataset
+smote = SMOTE(random_state=42)
+X_resampled, y_resampled = smote.fit_resample(X_train, y_train)
 
-# Making predictions
-y_pred = model.predict(X_test)
+# Train Random Forest model on balanced data
+model_smote = RandomForestClassifier(n_estimators=100, random_state=42)
+model_smote.fit(X_resampled, y_resampled)
 
-# Evaluating the model
-accuracy = accuracy_score(y_test, y_pred)
-report = classification_report(y_test, y_pred)
-conf_matrix = confusion_matrix(y_test, y_pred)
+# Make predictions
+y_pred_smote = model_smote.predict(X_test)
 
-# Displaying results
-print(f"Model Accuracy: {accuracy:.4f}")
-print("\nClassification Report:\n", report)
+# Evaluate the improved model
+accuracy_smote = accuracy_score(y_test, y_pred_smote)
+report_smote = classification_report(y_test, y_pred_smote)
+conf_matrix_smote = confusion_matrix(y_test, y_pred_smote)
 
-# Plot confusion matrix
+# Display results
+print(f"Model Accuracy After SMOTE: {accuracy_smote:.4f}")
+print("\nClassification Report After SMOTE:\n", report_smote)
+
+# Plot confusion matrix after SMOTE
 plt.figure(figsize=(6, 4))
-sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=["Not Fraud", "Fraud"], yticklabels=["Not Fraud", "Fraud"])
+sns.heatmap(conf_matrix_smote, annot=True, fmt='d', cmap='Blues', xticklabels=["Not Fraud", "Fraud"], yticklabels=["Not Fraud", "Fraud"])
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
-plt.title("Confusion Matrix")
+plt.title("Confusion Matrix After SMOTE")
 plt.show()

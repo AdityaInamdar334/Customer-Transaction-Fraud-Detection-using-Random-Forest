@@ -68,6 +68,7 @@ python src/fraud_detection.py
 - The **Random Forest model achieved 94.8% accuracy**, but initially struggled with fraud detection due to class imbalance.
 - Using **class balancing techniques** (e.g., oversampling), the performance on fraud detection can be improved.
 - Feature importance analysis helps determine the most relevant factors in fraud detection.
+![image](https://github.com/user-attachments/assets/21dd2dc0-4217-4cee-b93d-2cc1c4cce0cf)
 
 ---
 
